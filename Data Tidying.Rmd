@@ -1,0 +1,39 @@
+---
+title: "Data Tidying"
+author: "AMBenson"
+date: "October 16, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r,warning=F, message=F}
+
+setwd("C:/Users/AMBenson/Documents/R Training")
+library(dplyr)
+library(tidyr)
+
+```
+ get catch data 
+```{r read catch data}
+catch_df <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", method = "libcurl"),
+                    stringsAsFactors = FALSE)
+head(catch_df)
+
+```
+
+`select`the columns we need for analysis
+`gather` to move from wide to long
+```{r use gather spread}
+catch_clean<-catch_df %>% 
+    #select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %>% 
+    select(-All,-notesRegCode) %>% 
+    gather(key="Species", value="catch",-Region,-Year) %>% 
+    ##opposite of gather is spread (to put it back the way it was)
+    #spread(key="Species", value="catch")##key is what you turn into column names
+    rename(catch_thousands=catch)
+    head(catch_clean)
+    ##we want to gather over the species columns ... is selection of columns
+```
+```{r}
