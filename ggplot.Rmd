@@ -1,0 +1,114 @@
+---
+title: "ggplot"
+author: "AMBenson"
+date: "October 17, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Import Data and load libraries
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(tidyr)
+  library(dplyr)
+  library(DT)
+})
+
+# https://knb.ecoinformatics.org/#view/urn:uuid:e05865d7-678d-4513-9061-2ab7d979f8e7
+# Search 'permit value'
+permits <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Aa3c58bd6-481e-4c64-aa93-795df10a4664", method = "libcurl"), stringsAsFactors = FALSE)
+
+datatable(permits)
+```
+
+scatter plot 2 dimensional (x and y axis) therefore must know your x and y values
+geometrical aspect of the plot (color, size, shape of geom)
+aes--aesthetic is bad name!  map variable to geometric aspect of plot
+think in terms of mapping--output of the aesthetic mapped to plot
+plus sign to add things to plot--layer things
+```{r}
+help("GeomPoint")
+ggplot(permits, aes(x=Value, y=StdDev,color=Gear,shape=Region)) + 
+  geom_point()
+```
+Assigning aesthetics--only for variables
+has to be the name of a variable in your data set 
+if you assign color= blue in the aesthetic wonkiness--should be in the geom_point
+```{r}
+ggplot(permits, aes(x=Value, y=StdDev,shape=Region)) + 
+  geom_point(color='blue')
+```
+histogram--only need a single variable
+defaults to 30 bins if you don't say something different
+If you get a warning, your column may have an NA or missing value
+```{r}
+ggplot(permits, aes(Value)) + 
+  geom_histogram(binwidth = 10000)
+```
+Boxplot##tells you so much infor about your data
+```{r}
+ggplot(permits, aes(Gear, Value)) + 
+  geom_boxplot()
+```
+
+```{r}
+permits_ci <- permits %>%
+  filter(Region == "Cook Inlet")
+
+ggplot(permits_ci, aes(Gear, Value)) + 
+  geom_violin()+
+   geom_point(shape = 1, position = "jitter")
+```
+
+```{r}
+ggplot(permits, aes(Value, StdDev)) + 
+  geom_point() +
+  geom_smooth()
+```
+note the grey area plots the 95% confidence
+```{r}
+ggplot(permits, aes(Value, StdDev)) + 
+  geom_point() +
+  geom_smooth(method='lm')
+##default method is loess
+```
+Summarize data and the plot a bar plot
+position and stat are the fundamental things to understand
+position--controls how regions displayed stack=put them on top of eachother
+stat--default is mean
+
+```{r}
+permits_sum <- permits %>% 
+  group_by(Gear, Region) %>% 
+  summarize(mean_value = mean(Value, na.rm = T))
+
+ggplot(permits_sum, aes(x = Gear, y = mean_value, fill = Region)) +
+  geom_bar(position = "stack", stat = "identity")
+```
+Line graph
+scale_y_continous....change the format of the y axis
+```{r}
+###filter only SE AK permits
+permits_se_seine <- permits %>% 
+  filter(Gear == "Purse Seine", 
+         Region == "Southeast")
+
+ggplot(permits_se_seine, aes(Year, Value)) + 
+  geom_point() +
+  geom_line()
+  scale_y_continuous(limits = c(0, max(permits_se_seine$Value)))
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
