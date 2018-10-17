@@ -36,4 +36,44 @@ catch_clean<-catch_df %>%
     head(catch_clean)
     ##we want to gather over the species columns ... is selection of columns
 ```
+
 ```{r}
+test<-as.numeric(catch_clean$catch_thousands)
+##find out which row got turned into an NA
+i<-which(is.na(test)==T)
+catch_clean[i,]
+##find out it is row 401
+##it is a Captial I
+###the data were scanned and accidentally 
+```
+`mutate` to create a new catch column
+fix typeo in orignal dataset original data set had an I instead of 1
+coerce tto catch to numeric
+```{r}
+catch_clean_mutated<-catch_clean %>%
+  mutate(catch_thousands=ifelse(catch_thousands=="I",1,catch_thousands)) %>% 
+  mutate(catch_thousands=as.numeric(catch_thousands)) %>% 
+  mutate(catch=catch_thousands*1000) %>% 
+  select(-catch_thousands)
+tail(catch_clean_mutated)
+```
+
+Most useful functions
+split using `group_by`
+apply and combine using `summarize`
+
+```{r}
+catch_summarized<-catch_clean_mutated%>%
+  group_by(Year,Region) %>% 
+  summarize(mean_catch=mean(catch),
+  n_obs=n())
+tail(catch_summarized)
+```
+```{r}
+catch_chinook<-catch_clean_mutated %>% 
+  filter(Species=="Chinook")
+  arrange(-catch)
+tail(catch_chinook)
+  
+```
+
