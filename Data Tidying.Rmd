@@ -116,3 +116,4 @@ dates_separate
 ```
 
 
+help(table)

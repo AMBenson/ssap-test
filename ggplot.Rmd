@@ -101,14 +101,89 @@ permits_se_seine <- permits %>%
 ggplot(permits_se_seine, aes(Year, Value)) + 
   geom_point() +
   geom_line()
-  scale_y_continuous(limits = c(0, max(permits_se_seine$Value)))
+  scale_y_continuous(limits = c(0, max(permits_se_seine$Value)))+
+  
+```
+style/color preferences
+```{r}
+ggplot(permits, aes(Value, StdDev, color = Gear)) + 
+  geom_point() + 
+  scale_color_hue(h = c(270, 360)) # blue to red
+  
+```
+themes
+```{r}
+ggplot(permits, aes(Value, StdDev, color = Gear)) + 
+  geom_point() +
+  theme_classic()
+```
+```{r}
+ggplot(permits, aes(Value, StdDev, color = Gear)) + 
+  geom_point() +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        legend.background = element_rect(fill = "#EEEEEE", color = "black"),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 16))
+```
+
+```{r}
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  theme_classic() +
+  theme(legend.position = c(1, 1),
+        legend.justification = c(1,1),
+        legend.direction = "horizontal",
+        legend.title = element_blank()) +
+  xlab("Permit Value (unadjusted USD)") +
+  ylab("Permit Std. Dev. (unadjusted USD)") +
+  ggtitle("Permit Standard Deviation against Permit Value by Gear Type",
+          "or: I wish I owned a seine permit")
+```
+```{r}
+my_theme <- theme_bw() +
+  theme(legend.title = element_blank(),
+        panel.grid.major = element_line(size = 1, linetype = 4),
+        panel.grid.minor = element_blank())
+  
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  my_theme
+
 ```
 
 ```{r}
 
 ```
 
+facets##repeats of the same plot 
 ```{r}
+ggplot(permits_ci, aes(Year, Value)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ Gear)
+```
+facet_wrap() chose a layout for us but, in this case, it aids comparison if we stack eachpanel on top of one another:
+```{r}
+ggplot(permits_ci, aes(Year, Value)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ Gear, ncol = 1)
+```
 
+```{r}
+suppressPackageStartupMessages({
+  library(gridExtra)
+})
+
+p1 <- ggplot(permits_se_seine, aes(Year, Value)) +
+  geom_point() + 
+  geom_line()
+
+p2 <- ggplot(permits %>% filter(Gear == "Purse Seine"), aes(Region, Value)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = function(x) { format(x, scientific = FALSE) })
+
+grid.arrange(p1, p2)
 ```
 
